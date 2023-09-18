@@ -48,10 +48,29 @@ func (lexer *Lexer) NextToken() token.Token {
 	case 0:
 		tokenVar.Literal = ""
 		tokenVar.Type = token.EOF
+	default:
+		if isLetter(lexer.character) {
+			tokenVar.Literal = lexer.readIdentifier()
+			return tokenVar
+		} else {
+			tokenVar = newToken(token.ILLEGAL, lexer.character)
+		}
 	}
 
 	lexer.readChar()
 	return tokenVar
+}
+
+func (lexer *Lexer) readIdentifier() string {
+	position := lexer.position
+	for isLetter(lexer.character) {
+		lexer.readChar()
+	}
+	return lexer.input[position:lexer.position]
+}
+
+func isLetter(character byte) bool {
+	return 'a' <= character && character <= 'z' || 'A' <= character && character <= 'Z' || character == '_'
 }
 
 func newToken(tokenType token.TokenType, character byte) token.Token {
