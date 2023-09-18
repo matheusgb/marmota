@@ -51,6 +51,7 @@ func (lexer *Lexer) NextToken() token.Token {
 	default:
 		if isLetter(lexer.character) {
 			tokenVar.Literal = lexer.readIdentifier()
+			tokenVar.Type = LookupIdentifier(tokenVar.Literal)
 			return tokenVar
 		} else {
 			tokenVar = newToken(token.ILLEGAL, lexer.character)
@@ -71,6 +72,18 @@ func (lexer *Lexer) readIdentifier() string {
 
 func isLetter(character byte) bool {
 	return 'a' <= character && character <= 'z' || 'A' <= character && character <= 'Z' || character == '_'
+}
+
+var keywords = map[string]token.TokenType{
+	"fn":  token.FUNCTION,
+	"let": token.LET,
+}
+
+func LookupIdentifier(identifier string) token.TokenType {
+	if tokenType, ok := keywords[identifier]; ok {
+		return tokenType
+	}
+	return token.IDENT
 }
 
 func newToken(tokenType token.TokenType, character byte) token.Token {
