@@ -28,6 +28,8 @@ func (lexer *Lexer) readChar() {
 func (lexer *Lexer) NextToken() token.Token {
 	var tokenVar token.Token
 
+	lexer.skipWhitespace()
+
 	switch lexer.character {
 	case '=':
 		tokenVar = newToken(token.ASSIGN, lexer.character)
@@ -60,6 +62,12 @@ func (lexer *Lexer) NextToken() token.Token {
 
 	lexer.readChar()
 	return tokenVar
+}
+
+func (lexer *Lexer) skipWhitespace() {
+	for lexer.character == ' ' || lexer.character == '\t' || lexer.character == '\n' || lexer.character == '\r' {
+		lexer.readChar()
+	}
 }
 
 func (lexer *Lexer) readIdentifier() string {
