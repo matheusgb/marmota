@@ -1,4 +1,4 @@
 TODO:
 
-* [ ] Arrow functions identifier
+* [X] Arrow functions identifier
 * [ ] Floats identifier
