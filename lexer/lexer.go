@@ -1,6 +1,8 @@
 package lexer
 
-import "github.com/matheusgb/marmota/token"
+import (
+	"github.com/matheusgb/marmota/token"
+)
 
 type Lexer struct {
 	input        string
@@ -32,7 +34,35 @@ func (lexer *Lexer) NextToken() token.Token {
 
 	switch lexer.character {
 	case '=':
-		tokenVar = newToken(token.ASSIGN, lexer.character)
+		if lexer.peekChar() == '=' {
+			character := lexer.character
+			lexer.readChar()
+			tokenVar = token.Token{Type: token.EQ, Literal: string(character) + string(lexer.character)}
+		} else if lexer.peekChar() == '>' {
+			character := lexer.character
+			lexer.readChar()
+			tokenVar = token.Token{Type: token.ARROW_FUNCTION, Literal: string(character) + string(lexer.character)}
+		} else {
+			tokenVar = newToken(token.ASSIGN, lexer.character)
+		}
+	case '-':
+		tokenVar = newToken(token.MINUS, lexer.character)
+	case '!':
+		if lexer.peekChar() == '=' {
+			character := lexer.character
+			lexer.readChar()
+			tokenVar = token.Token{Type: token.NOT_EQ, Literal: string(character) + string(lexer.character)}
+		} else {
+			tokenVar = newToken(token.BANG, lexer.character)
+		}
+	case '/':
+		tokenVar = newToken(token.SLASH, lexer.character)
+	case '*':
+		tokenVar = newToken(token.ASTERISK, lexer.character)
+	case '<':
+		tokenVar = newToken(token.LT, lexer.character)
+	case '>':
+		tokenVar = newToken(token.GT, lexer.character)
 	case ';':
 		tokenVar = newToken(token.SEMICOLON, lexer.character)
 	case '(':
@@ -98,13 +128,8 @@ func isLetter(character byte) bool {
 	return 'a' <= character && character <= 'z' || 'A' <= character && character <= 'Z' || character == '_'
 }
 
-var keywords = map[string]token.TokenType{
-	"fn":  token.FUNCTION,
-	"let": token.LET,
-}
-
 func LookupIdentifier(identifier string) token.TokenType {
-	if tokenType, ok := keywords[identifier]; ok {
+	if tokenType, ok := token.Keywords[identifier]; ok {
 		return tokenType
 	}
 	return token.IDENT
@@ -112,4 +137,12 @@ func LookupIdentifier(identifier string) token.TokenType {
 
 func newToken(tokenType token.TokenType, character byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(character)}
+}
+
+func (lexer *Lexer) peekChar() byte {
+	if lexer.readPosition >= len(lexer.input) {
+		return 0
+	} else {
+		return lexer.input[lexer.readPosition]
+	}
 }
