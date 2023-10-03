@@ -2,8 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/user"
+
+	"github.com/matheusgb/marmota/repl"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
+	user, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Print("Welcome to Rinha programming language!\n", user.Username)
+	repl.Start(os.Stdin, os.Stdout)
 }
